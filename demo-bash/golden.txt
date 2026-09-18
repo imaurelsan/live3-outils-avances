@@ -1,0 +1,39 @@
+=== SORTIE ===
+archive=20260918-120000 fichiers=7 octets=4186 purgees=2
+=== CODE ===
+0
+=== ARBRE ===
+./ailleurs.log
+./archives
+./archives/20260915-120000
+./archives/20260915-120000/MANIFESTE.txt
+./archives/20260917-120000
+./archives/20260917-120000/MANIFESTE.txt
+./archives/20260918-120000
+./archives/20260918-120000/-etrange.log
+./archives/20260918-120000/MANIFESTE.txt
+./archives/20260918-120000/acces.log
+./archives/20260918-120000/erreurs.log
+./archives/20260918-120000/gros.log
+./archives/20260918-120000/mon rapport final.log
+./archives/20260918-120000/rapport-2026-été.log
+./archives/20260918-120000/vide.log
+./logs
+./logs/app.log
+./logs/app.log.1
+./logs/lien.log
+./logs/limite.log
+./logs/notes.txt
+./logs/sous-dossier.log.d
+=== MANIFESTE ===
+archive: 20260915-120000
+archive: 20260917-120000
+archive: 20260918-120000
+source: <BAC>/logs
+limite: 1789128000
+fichiers: 7
+octets: 4186
+=== CAS LIMITES ===
+manquant -> 66
+vide -> 1
+sans-argument -> 64
