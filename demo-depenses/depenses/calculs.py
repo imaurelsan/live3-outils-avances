@@ -41,3 +41,35 @@ def soldes(depenses) -> dict[str, int]:
     for nom in participants(depenses):
         resultat.setdefault(nom, 0)
     return dict(resultat)
+
+
+def transferts(depenses) -> list[tuple[str, str, int]]:
+    """Construit des virements deterministes qui apurent tous les soldes."""
+    s = soldes(depenses)
+    debiteurs = sorted(
+        ((nom, -montant) for nom, montant in s.items() if montant < 0),
+        key=lambda item: (-item[1], item[0]),
+    )
+    crediteurs = sorted(
+        ((nom, montant) for nom, montant in s.items() if montant > 0),
+        key=lambda item: (-item[1], item[0]),
+    )
+
+    virements = []
+    i = j = 0
+    while i < len(debiteurs) and j < len(crediteurs):
+        debiteur, dette = debiteurs[i]
+        crediteur, creance = crediteurs[j]
+        montant = min(dette, creance)
+        virements.append((debiteur, crediteur, montant))
+        dette -= montant
+        creance -= montant
+        if dette == 0:
+            i += 1
+        else:
+            debiteurs[i] = (debiteur, dette)
+        if creance == 0:
+            j += 1
+        else:
+            crediteurs[j] = (crediteur, creance)
+    return virements

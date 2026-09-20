@@ -3,8 +3,9 @@ import json
 import pytest
 
 from depenses import Groupe, ErreurValidation, charger, parts, sauver, soldes, total
+from depenses.calculs import transferts
 from depenses.cli import euros_vers_cents, main
-from depenses.rendu import euros
+from depenses.rendu import euros, table_transferts
 
 
 @pytest.fixture
@@ -140,3 +141,57 @@ def test_json_serialisable(groupe, tmp_path):
     f = str(tmp_path / "g.json")
     sauver(groupe, f)
     json.loads(open(f, encoding="utf-8").read())
+
+
+# --- transferts ---------------------------------------------------------
+
+def test_transferts_groupe_vide():
+    assert transferts([]) == []
+
+
+def test_transferts_une_personne_paie_pour_elle_meme():
+    d = Groupe().ajouter("X", 1000, "Ana", ["Ana"])
+    assert transferts([d]) == []
+
+
+def test_transferts_groupe_deja_equilibre():
+    g = Groupe()
+    g.ajouter("X", 1000, "Ana", ["Ana", "Bo"])
+    g.ajouter("Y", 1000, "Bo", ["Ana", "Bo"])
+    assert transferts(g.lister()) == []
+    assert table_transferts(g.lister()) == "Rien a rembourser."
+
+
+def test_transferts_deux_personnes():
+    d = Groupe().ajouter("X", 10000, "Ana", ["Ana", "Bo"])
+    assert transferts([d]) == [("Bo", "Ana", 5000)]
+
+
+def test_transferts_reste_non_divisible():
+    d = Groupe().ajouter("X", 100, "Ana", ["Ana", "Bo", "Cyd"])
+    virements = transferts([d])
+    assert sum(montant for _, _, montant in virements) == 66
+    assert all(isinstance(montant, int) and montant > 0
+               for _, _, montant in virements)
+
+
+def test_transferts_debiteurs_ex_aequo_deterministes():
+    d = Groupe().ajouter("A", 3000, "Ana", ["Ana", "Bo", "Cyd"])
+    virements = transferts([d])
+    assert virements == transferts([d])
+    assert [debiteur for debiteur, _, _ in virements] == ["Bo", "Cyd"]
+
+
+def test_transferts_un_debiteur_plusieurs_crediteurs():
+    g = Groupe()
+    g.ajouter("A", 1000, "Ana", ["Ana", "Bo"])
+    g.ajouter("B", 1000, "Cyd", ["Cyd", "Bo"])
+    virements = transferts(g.lister())
+    assert len(virements) <= 2
+    assert {crediteur for _, crediteur, _ in virements} == {"Ana", "Cyd"}
+
+
+def test_cli_equilibrer_retourne_zero(tmp_path, capsys):
+    f = str(tmp_path / "g.json")
+    assert main(["--fichier", f, "equilibrer"]) == 0
+    assert capsys.readouterr().out.strip() == "Rien a rembourser."

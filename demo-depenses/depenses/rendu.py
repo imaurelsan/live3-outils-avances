@@ -1,6 +1,6 @@
 """Rendu texte. Aucune logique de calcul ici."""
 
-from .calculs import soldes, total
+from .calculs import soldes, total, transferts
 
 
 def euros(cents: int) -> str:
@@ -31,4 +31,15 @@ def table_soldes(depenses) -> str:
     lignes = ["%-14s %12s" % ("PERSONNE", "SOLDE"), "-" * 27]
     for nom in sorted(s):
         lignes.append("%-14s %12s" % (nom, euros(s[nom])))
+    return "\n".join(lignes)
+
+
+def table_transferts(depenses) -> str:
+    virements = transferts(depenses)
+    if not virements:
+        return "Rien a rembourser."
+    lignes = ["DEBITEUR       CREDITEUR          MONTANT", "-" * 44]
+    for debiteur, crediteur, montant in virements:
+        lignes.append("%-14s %-18s %12s" % (
+            debiteur, crediteur, euros(montant)))
     return "\n".join(lignes)

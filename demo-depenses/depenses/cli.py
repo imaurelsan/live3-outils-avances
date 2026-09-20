@@ -5,7 +5,7 @@ import sys
 
 from .calculs import total
 from .modeles import ErreurValidation
-from .rendu import euros, table_depenses, table_soldes
+from .rendu import euros, table_depenses, table_soldes, table_transferts
 from .stockage import charger, sauver
 
 FICHIER_DEFAUT = "groupe.json"
@@ -27,6 +27,7 @@ def construire_parseur():
     sp.add_parser("lister", help="liste les depenses")
     sp.add_parser("total", help="affiche le total")
     sp.add_parser("soldes", help="affiche le solde de chacun")
+    sp.add_parser("equilibrer", help="affiche les remboursements")
 
     s = sp.add_parser("supprimer", help="supprime une depense")
     s.add_argument("id", type=int)
@@ -62,6 +63,8 @@ def main(argv=None):
             print(euros(total(groupe.lister())))
         elif args.commande == "soldes":
             print(table_soldes(groupe.lister()))
+        elif args.commande == "equilibrer":
+            print(table_transferts(groupe.lister()))
         elif args.commande == "supprimer":
             groupe.supprimer(args.id)
             sauver(groupe, args.fichier)
