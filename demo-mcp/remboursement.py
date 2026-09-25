@@ -4,7 +4,6 @@ Calcul des remboursements clients.
 Regles metier : voir REGLES.md.
 """
 
-TAUX_TVA = 0.20
 FRAIS_DOSSIER_CENTS = 250
 
 
@@ -21,6 +20,8 @@ def montant_remboursable(montant_cents, statut, jours_depuis_achat):
         base = montant_cents
     elif statut == "perdue":
         base = montant_cents
+    elif statut == "partielle":
+        base = montant_cents // 2
     elif statut == "livree":
         base = montant_cents if jours_depuis_achat <= 14 else 0
     else:

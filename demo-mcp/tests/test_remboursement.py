@@ -11,6 +11,10 @@ def test_perdue_integrale():
     assert m(10000, "perdue", 40) == 10000
 
 
+def test_partielle_moitie_moins_frais():
+    assert m(10000, "partielle", 3) == 4750
+
+
 def test_livree_dans_les_delais():
     assert m(10000, "livree", 14) == 10000 - 250
 
